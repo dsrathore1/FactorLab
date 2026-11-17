@@ -1,8 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import {
+  BarChart,
+  Bar,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
+const chartTooltipStyle = {
+  backgroundColor: "#111827",
+  border: "1px solid #39445b",
+  borderRadius: "8px",
+  color: "#eef2ff",
+};
 
 export default function Home() {
   const [number, setNumber] = useState("8051");
@@ -16,6 +33,7 @@ export default function Home() {
     setError("");
     setData(null);
     setLoading(true);
+
     try {
       const response = await fetch(`${API_URL}/api/factorize`, {
         method: "POST",
@@ -32,11 +50,17 @@ export default function Home() {
     }
   }
 
+  const chartData = data?.results?.map((result) => ({
+    algorithm: result.algorithm,
+    "Execution time (ms)": Number(result.time_ms),
+    "Steps / iterations": Number(result.steps),
+  })) ?? [];
+
   return (
     <main className="shell">
       <nav className="nav">
         <a className="brand" href="#"><span className="brand-icon">π</span> FactorLab</a>
-        <span className="nav-tag">MATHS PROJECT · ALGORITHM VISUALIZER</span>
+        <span className="nav-tag">MINOR PROJECT · ALGORITHM VISUALIZER</span>
       </nav>
 
       <section className="hero">
@@ -77,7 +101,7 @@ export default function Home() {
                 <div className="factor-line">{result.factors.map((factor, i) => <span className="factor" key={`${factor}-${i}`}>{factor}</span>)}</div>
                 <div className="equation">{data.number} = {result.factors.join(" × ")}</div>
                 <div className="stats">
-                  <div><strong>{result.steps.toLocaleString()}</strong><span>Steps / iterations</span></div>
+                  <div><strong>{Number(result.steps).toLocaleString()}</strong><span>Steps / iterations</span></div>
                   <div><strong>{result.time_ms} ms</strong><span>Execution time</span></div>
                 </div>
               </article>
@@ -88,13 +112,44 @@ export default function Home() {
 
       {data && data.results.length > 1 && (
         <section className="panel comparison">
-          <div className="section-label">03 / COMPARISON</div>
-          <h2>Algorithm performance</h2>
-          <p className="muted">Measurements from this run on your machine.</p>
-          <div className="compare-grid">
-            {data.results.map((r) => <div key={r.algorithm}><span>{r.algorithm}</span><strong>{r.time_ms} <small>ms</small></strong><div className="bar"><i style={{ width: `${Math.max(4, r.time_ms / Math.max(...data.results.map(x => x.time_ms), 0.0001) * 100)}%` }} /></div><small>{r.steps.toLocaleString()} steps / iterations</small></div>)}
+          <div className="section-label">03 / VISUAL COMPARISON</div>
+          <h2>Algorithm performance graph</h2>
+          <p className="muted">Live measurements returned by the backend for this input.</p>
+
+          <div className="chart-grid">
+            <div className="chart-card">
+              <h3>Execution time</h3>
+              <p>Lower is faster · milliseconds</p>
+              <div className="chart-wrap">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 12, right: 12, left: 0, bottom: 5 }}>
+                    <CartesianGrid stroke="#293449" strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="algorithm" tick={{ fill: "#c6b991", fontSize: 11 }} axisLine={{ stroke: "#39445b" }} tickLine={false} />
+                    <YAxis tick={{ fill: "#8995aa", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={chartTooltipStyle} formatter={(value) => [`${value} ms`, "Execution time"]} />
+                    <Bar dataKey="Execution time (ms)" fill="#e0b13f" radius={[6, 6, 0, 0]} maxBarSize={76} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="chart-card">
+              <h3>Steps / iterations</h3>
+              <p>Number of computational steps</p>
+              <div className="chart-wrap">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 12, right: 12, left: 0, bottom: 5 }}>
+                    <CartesianGrid stroke="#293449" strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="algorithm" tick={{ fill: "#c6b991", fontSize: 11 }} axisLine={{ stroke: "#39445b" }} tickLine={false} />
+                    <YAxis tick={{ fill: "#8995aa", fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={chartTooltipStyle} formatter={(value) => [Number(value).toLocaleString(), "Steps / iterations"]} />
+                    <Bar dataKey="Steps / iterations" fill="#f2cf68" radius={[6, 6, 0, 0]} maxBarSize={76} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
-          <p className="footnote">Runtime varies with the input, hardware, and Pollard&apos;s Rho random starting values. A single run is not a universal performance benchmark.</p>
+          <p className="footnote">Runtime can vary with hardware and Pollard&apos;s Rho random starting values. Compare repeated runs for a more reliable benchmark; one run is not a universal performance guarantee.</p>
         </section>
       )}
 
