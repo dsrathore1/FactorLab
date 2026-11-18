@@ -22,6 +22,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://factor-lab-chi.vercel.app",
+        "https://factor-1xuzxt51o-ds-rathores-projects-e04cf2f2.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],

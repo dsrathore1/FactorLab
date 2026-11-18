@@ -6,7 +6,10 @@ import {
 } from "recharts";
 import "./globals.css";
 
-const API_URL = (process.env.API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+).replace(/\/$/, "");
+
 const tooltipStyle = { backgroundColor: "#111827", border: "1px solid #39445b", borderRadius: 8, color: "#eef2ff" };
 
 export default function Home() {
