@@ -5,12 +5,12 @@ import {
   BarChart,
   Bar,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import "./globals.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
@@ -60,7 +60,7 @@ export default function Home() {
     <main className="shell">
       <nav className="nav">
         <a className="brand" href="#"><span className="brand-icon">π</span> FactorLab</a>
-        <span className="nav-tag">MINOR PROJECT · ALGORITHM VISUALIZER</span>
+        <span className="nav-tag">MATHS PROJECT · ALGORITHM VISUALIZER</span>
       </nav>
 
       <section className="hero">
